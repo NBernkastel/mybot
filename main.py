@@ -23,7 +23,7 @@ async def play(ctx):
     else:
         voice = await channel.connect()
     with YoutubeDL(YDL_OPTIONS) as ydl:
-        info = ydl.extract_info(download=False,url = 'https://www.youtube.com/watch?v=2xQ3Aq1m6lk')
+        info = ydl.extract_info(download=False,url = 'https://www.youtube.com/watch?v=A-qRH1yuqXc&list=RDGMEMJQXQAmqrnmK1SEjY_rKBGAVMA-qRH1yuqXc&start_radio=1')
         URL = info['formats'][0]['url']
         voice.play(discord.FFmpegPCMAudio(URL))
 
