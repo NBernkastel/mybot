@@ -4,7 +4,8 @@ from discord import utils
 from discord.utils import get
 from discord.ext.commands import Bot
 from youtube_dl import YoutubeDL
-client = Bot(command_prefix=";;",intens = discord.Intents.default())
+intents = discord.Intents.default()
+client = Bot(command_prefix=';;', intents=intents)
 YDL_OPTIONS = {'format': 'worstaudio/best',
                'noplaylist': 'True', 'simulate': 'True', 'preferredquality': '192', 'preferredcodec': 'mp3', 'key': 'FFmpegExtractAudio'}
 @client.event
