@@ -1,11 +1,11 @@
 import discord
 import config
-from discord import utils, RequestsWebhookAdapter, Webhook
+from discord import utils, Webhook
 from discord.utils import get
 from discord.ext.commands import Bot
 from youtube_dl import YoutubeDL
 import asyncio
-client = Bot(command_prefix='..')
+client = Bot(command_prefix='..',intents=discord.Intents.all())
 client.remove_command("help")
 YDL_OPTIONS = {'format': 'worstaudio/best',
                'noplaylist': 'True', 'simulate': 'True', 'preferredquality': '192', 'preferredcodec': 'mp3', 'key': 'FFmpegExtractAudio'}
@@ -58,7 +58,7 @@ async def on_ready():
     print("redy")
 @client.event
 async def on_message(message):
-    if not await client.process_commands(message):
-        if message.author != client.user:
-            await message.reply(message.content)
+    await client.process_commands(message)
+      #  if message.author != client.user:
+        #    await message.reply(message.content)
 client.run('OTk5NjQ0NzAxMzU3NTEwNzI2.GIgRc_.MkETjYyMMCmTFDa6oqPV6OUc6lWREAx28hm-Ho')
