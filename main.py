@@ -49,7 +49,7 @@ async def resume(ctx):
     print("resumed")
 @client.command(pass_context=True)
 async def help(ctx):
-    webhook = Webhook.from_url(config.webhook,adapter=RequestsWebhookAdapter())
+    webhook = Webhook.from_url(config.webhook,adapter=Webhook())
     embed = discord.Embed(colour = discord.colour.Color.red(),title= config.help)
     webhook.send(embed=embed,username= "help")
 @client.event
