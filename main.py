@@ -1,10 +1,10 @@
 import discord
 import config
-from discord import utils, Webhook, RequestsWebhookAdapter
+from discord import utils, Webhook
 from discord.utils import get
 from discord.ext.commands import Bot
 from youtube_dl import YoutubeDL
-import asyncio
+from aiohttp import ClientSession
 client = Bot(command_prefix='..',intents=discord.Intents.all())
 client.remove_command("help")
 YDL_OPTIONS = {'format': 'worstaudio/best',
@@ -49,9 +49,10 @@ async def resume(ctx):
     print("resumed")
 @client.command(pass_context=True)
 async def help(ctx):
-    webhook = Webhook.from_url(config.webhook,adapter=Webhook())
-    embed = discord.Embed(colour = discord.colour.Color.red(),title= config.help)
-    webhook.send(embed=embed,username= "help")
+    async with ClientSession() as session:
+        webhook = Webhook.from_url(config.webhook,session=session)
+        embed = discord.Embed(colour = discord.colour.Color.red(),title= config.help)
+        await webhook.send(embed=embed,username= "help")
 @client.event
 async def on_ready():
     await client.change_presence(status=discord.Status.online, activity=discord.Game("автор Nexeland"))
