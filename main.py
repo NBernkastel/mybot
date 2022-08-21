@@ -30,7 +30,7 @@ async def play(ctx):
             info = ydl.extract_info(download=False,url = queue[0])
             queue.pop(0)
             URL = info['formats'][0]['url']
-            voice.play(discord.FFmpegPCMAudio(executable='ffmpeg.exe',source=URL))
+            voice.play(discord.FFmpegPCMAudio(URL))
 @client.command(pass_context=True)
 async def stop(ctx):
     voice.stop()
