@@ -1,36 +1,43 @@
-
 import discord
 import config
-from discord import utils, RequestsWebhookAdapter
+from discord import utils, RequestsWebhookAdapter, Webhook
 from discord.utils import get
 from discord.ext.commands import Bot
 from youtube_dl import YoutubeDL
-from discord import Webhook
+import asyncio
 client = Bot(command_prefix='..')
 client.remove_command("help")
 YDL_OPTIONS = {'format': 'worstaudio/best',
                'noplaylist': 'True', 'simulate': 'True', 'preferredquality': '192', 'preferredcodec': 'mp3', 'key': 'FFmpegExtractAudio'}
+queue = []
 @client.command(pass_context=True)
 async def play(ctx):
-    print("work")
     global voice
     channel = ctx.message.author.voice.channel
     message = ctx.message
-    cont = message.content.split(" ")
-    print(cont)
+    content = message.content.split(" ")
+    queue.append(content[1])
     voice = get(client.voice_clients, guild=ctx.guild)
     if voice and voice.is_connected():
         await voice.move_to(channel)
     else:
         voice = await channel.connect()
-    with YoutubeDL(YDL_OPTIONS) as ydl:
-        info = ydl.extract_info(download=False,url = cont[1])
-        URL = info['formats'][0]['url']
-        voice.play(discord.FFmpegPCMAudio(URL))
+    if voice.is_playing():
+        await ctx.message.reply("add to the q")
+        print(queue)
+    else:
+        with YoutubeDL(YDL_OPTIONS) as ydl:
+            info = ydl.extract_info(download=False,url = queue[0])
+            queue.pop(0)
+            URL = info['formats'][0]['url']
+            voice.play(discord.FFmpegPCMAudio(URL))
 @client.command(pass_context=True)
 async def stop(ctx):
     voice.stop()
     print("stoped")
+@client.command(pass_context=True)
+async def lpl(ctx):
+    print("lox")
 @client.command(pass_context=True)
 async def pause(ctx):
     voice.pause()
@@ -43,14 +50,15 @@ async def resume(ctx):
 @client.command(pass_context=True)
 async def help(ctx):
     webhook = Webhook.from_url(config.webhook,adapter=RequestsWebhookAdapter())
-    embed = discord.Embed(colour = discord.colour.Color.red(),title= config.help,)
+    embed = discord.Embed(colour = discord.colour.Color.red(),title= config.help)
     webhook.send(embed=embed,username= "help")
 @client.event
 async def on_ready():
-    await client.change_presence(status=discord.Status.online, activity=discord.Game("jojo"))
+    await client.change_presence(status=discord.Status.online, activity=discord.Game("автор Nexeland"))
     print("redy")
 @client.event
 async def on_message(message):
-    if await client.process_commands(message) == False:
-        print(message.content)
+    if not await client.process_commands(message):
+        if message.author != client.user:
+            await message.reply(message.content)
 client.run('OTk5NjQ0NzAxMzU3NTEwNzI2.GIgRc_.MkETjYyMMCmTFDa6oqPV6OUc6lWREAx28hm-Ho')
