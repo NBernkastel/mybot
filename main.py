@@ -1,6 +1,6 @@
 import discord
 import config
-from discord import utils, Webhook
+from discord import utils, Webhook, RequestsWebhookAdapter
 from discord.utils import get
 from discord.ext.commands import Bot
 from youtube_dl import YoutubeDL
