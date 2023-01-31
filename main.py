@@ -5,14 +5,26 @@ from discord.utils import get
 from discord.ext.commands import Bot
 from youtube_dl import YoutubeDL
 import asyncio
+from time import sleep
 client = Bot(command_prefix='..',intents=discord.Intents.all())
 client.remove_command("help")
 YDL_OPTIONS = {'format': 'worstaudio/best',
                'noplaylist': 'True', 'simulate': 'True', 'preferredquality': '192', 'preferredcodec': 'mp3', 'key': 'FFmpegExtractAudio'}
 queue = []
+
+async def q():
+        global queue
+        while len(queue) > 0:
+            with YoutubeDL(YDL_OPTIONS) as ydl:
+                info = ydl.extract_info(download=False, url=queue[0])
+                queue.pop(0)
+                URL = info['formats'][0]['url']
+                voice.play(discord.FFmpegPCMAudio(URL))
+            await asyncio.sleep(info['duration'])
+
 @client.command(pass_context=True)
 async def play(ctx):
-    global voice
+    global voice,queue
     channel = ctx.message.author.voice.channel
     message = ctx.message
     content = message.content.split(" ")
@@ -24,13 +36,8 @@ async def play(ctx):
         voice = await channel.connect()
     if voice.is_playing():
         await ctx.message.reply("add to the q")
-        print(queue)
     else:
-        with YoutubeDL(YDL_OPTIONS) as ydl:
-            info = ydl.extract_info(download=False,url = queue[0])
-            queue.pop(0)
-            URL = info['formats'][0]['url']
-            voice.play(discord.FFmpegPCMAudio(URL))
+        await q()
 @client.command(pass_context=True)
 async def stop(ctx):
     voice.stop()
@@ -47,11 +54,6 @@ async def pause(ctx):
 async def resume(ctx):
     voice.resume()
     print("resumed")
-@client.command(pass_context=True)
-async def help(ctx):
-    webhook = Webhook.from_url(config.webhook,adapter=RequestsWebhookAdapter())
-    embed = discord.Embed(colour = discord.colour.Color.red(),title= config.help)
-    webhook.send(embed=embed,username= "help")
 @client.event
 async def on_ready():
     await client.change_presence(status=discord.Status.online, activity=discord.Game("автор Nexeland"))
